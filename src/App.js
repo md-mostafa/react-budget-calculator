@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import ExpenseList from './components/ExpenseList';
 import ExpenseForm from './components/ExpenseForm';
 import Alert from './components/Alert';
 import { v4 as uuidv4 } from 'uuid';
-const initialExpenses = [
-  {id: uuidv4(), charge: 'rent', amount: 1600},
-  {id: uuidv4(), charge: 'car payment', amount: 400},
-  {id: uuidv4(), charge: 'credit card bill', amount: 1200}
-];
+//const initialExpenses = [
+//  {id: uuidv4(), charge: 'rent', amount: 1600},
+//  {id: uuidv4(), charge: 'car payment', amount: 400},
+//  {id: uuidv4(), charge: 'credit card bill', amount: 1200}
+//];
+
+const initialExpenses = localStorage.getItem('expenses') ? JSON.parse(localStorage.getItem('expenses')) : [];
 
 console.log(initialExpenses);
 
@@ -29,6 +31,20 @@ function App() {
   const [edit, setEdit] = useState(false);
   //edit item
   const [id, setId] = useState(0);
+
+//useEffects let's perform side effects
+//runs after every render
+//first paramter - callback function (runs after render)
+//second paramter -array -for letting react know when to run useEffect.
+//react re-renders when state has changed or props
+
+//useEffect 
+   useEffect(()=> {
+     console.log('we called useEffect');
+     localStorage.setItem('expenses', JSON.stringify(expenses));
+   }, [expenses]);
+
+
   //functionality
 
   const handleCharge = e => {
