@@ -24,6 +24,11 @@ function App() {
   const [amount, setAmount] = useState('');
   //alert
   const [alert, setAlert] = useState({show: false});
+
+  //edit
+  const [edit, setEdit] = useState(false);
+  //edit item
+  const [id, setId] = useState(0);
   //functionality
 
   const handleCharge = e => {
@@ -42,13 +47,48 @@ function App() {
     }, 3000)
   };
 
+  //clear all items
+  const clearItems = ()=> {
+    setExpenses([]);
+    handleAlert({type: 'danger', text: 'all item deleted'});
+  }
+
+  //handle delete
+  const handleDelete = (id) => {
+    console.log(`item deleted : ${id}`);
+    let temExpenses = expenses.filter(item => item.id !== id);
+    setExpenses(temExpenses);
+    handleAlert({type: 'danger', text: 'item deleted'});
+  }
+
+  //handle edit
+  const handleEdit = (id) => {
+    let expense = expenses.find(item => item.id === id);
+    console.log(expense);
+    let {charge, amount} = expense;
+    setCharge(charge);
+    setAmount(amount);
+    setEdit(true);
+    setId(id);
+  }
 
   const handleSubmit = e => {
     e.preventDefault();
     if(charge !== '' && amount > 0){
-      const singleExpense = { id: uuidv4(), charge, amount };
-      setExpenses([...expenses, singleExpense]); //if given setExpenses([singleExpenses]) it will override everything
-      handleAlert({ type: 'success', text: 'item added' });
+
+      if(edit) {
+        let tempExpense = expenses.map(item => {
+          return item.id === id ? {...item, charge, amount} :item //item will stay in the same order
+        });
+        setExpenses(tempExpense);
+        setEdit(false);
+        handleAlert({ type: 'success', text: 'item edited' });
+
+      }else{
+        const singleExpense = { id: uuidv4(), charge, amount };
+        setExpenses([...expenses, singleExpense]); //if given setExpenses([singleExpenses]) it will override everything
+        handleAlert({ type: 'success', text: 'item added' });
+      }
       setCharge('');
       setAmount('');
     }else{
@@ -68,8 +108,14 @@ function App() {
           handleCharge= {handleCharge}
           handleAmount={handleAmount}
           handleSubmit={handleSubmit}
+          edit={edit}
         />
-        <ExpenseList expenses={expenses}/>
+        <ExpenseList 
+          expenses={expenses}
+          handleDelete={handleDelete}
+          handleEdit={handleEdit}
+          clearItems = {clearItems}
+        />
       </main>
       <h1>
         total spending: {""} 
